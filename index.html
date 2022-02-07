@@ -1,0 +1,72 @@
+<html>
+<head>
+    <style>
+        @import url("jquery-ui-1.8.16.custom.css");
+
+        body {  
+            margin: 0;
+        }
+
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="uiContainer" style="position: fixed; right: 0; top: 0;">
+        <div id="ui">
+            <div id="x"></div>
+            <div id="y"></div>
+            <div id="angle"></div>
+            <div id="scaleX"></div>
+            <div id="scaleY"></div>
+        </div>
+    </div>
+    <script src="webgl-utils.js"></script>
+    <script src="webgl-lessons-ui.js"></script>
+    
+    <script id="vertex-shader-2d" type="x-shader/x-vertex">     
+    attribute vec2 a_position;
+
+    uniform vec2 u_resolution;
+    uniform vec2 u_translation;
+    uniform vec2 u_rotation;
+    uniform vec2 u_scale;
+    
+    void main() {
+        vec2 scaledPosition = a_position * u_scale;
+
+        vec2 rotatedPosition = vec2(
+            scaledPosition.x * u_rotation.y + scaledPosition.y * u_rotation.x,
+            scaledPosition.y * u_rotation.y - scaledPosition.x * u_rotation.x);
+    
+        vec2 position = rotatedPosition + u_translation;
+    
+        vec2 zeroToOne = position / u_resolution;
+    
+        vec2 zeroToTwo = zeroToOne * 2.0;
+    
+        vec2 clipSpace = zeroToTwo - 1.0;
+    
+        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+    }
+    </script>
+
+    <script id="fragment-shader-2d" type="x-shader/x-fragment">
+    precision mediump float;
+
+    uniform vec4 u_color;
+
+    void main() {
+        gl_FragColor = u_color;
+    }
+    </script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
